@@ -1,17 +1,10 @@
-# S5-DICE-GAME
-Dice Game MySql, MongoDB and JWT
+# Tasca S5.02 Joc de Daus
 
-Tasca S5.02 Joc de Daus
-Feta: Rebre una qualificació
 Descripció
-
 
 Aquest és el teu projecte final, una API 100% dissenyada per tu on aplicaràs tot el que saps fins ara per a crear una aplicació al complet, des de la base de dades a la seguretat. Aplica tot el que saps fins i tot el que no es demana.
 
 Nivell 1
-
-
-
 
 El joc de daus s’hi juga amb dos daus. En cas que el resultat de la suma dels dos daus sigui 7, la partida és guanyada, si no és perduda. Un jugador/a pot  veure un llistat de totes les tirades que ha fet i el percentatge d’èxit.   
 
@@ -46,13 +39,8 @@ Canvia tot el que necessitis i utilitza MongoDB per persistir les dades.
 Afegeix seguretat: inclou autenticació per JWT en  tots els accessos a les URL's del microservei. 
 Nivell 2
 
-
-
-
 Afegeix tests unitaris, de component i d'integració al projecte amb llibreries jUnit, AssertJ o Hamcrest.
 Afegeix Mocks al testing del projecte (Mockito) i Contract Tests (https://docs.pact.io/)
-
-
 
 Nivell 3
 
