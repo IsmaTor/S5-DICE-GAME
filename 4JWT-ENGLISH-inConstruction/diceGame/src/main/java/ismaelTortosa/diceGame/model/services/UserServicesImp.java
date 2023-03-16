@@ -10,13 +10,15 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.logging.Logger;
+
 
 @Service
 public class UserServicesImp implements IUserServicesDAO {
+    private static final Logger LOGGER = Logger.getLogger(UserServicesImp.class.getName());
 
     @Autowired
     private UserRepository userRepository;
-
     @Autowired
     private WebSecurityConfig webSecurityConfig;
 
@@ -27,13 +29,23 @@ public class UserServicesImp implements IUserServicesDAO {
         String password;
         String passwordCodified;
 
-        if( !userRepository.existsByName(userDto.getName())){
-            userEntity.setName(userDto.getName());
-            userEntity.setRegister(date);
-            userEntity.setRegister(userDto.getRegister());
+        try {
+            if (!userRepository.existsByName(userDto.getName())) {
+                userEntity.setName(userDto.getName());
+                userEntity.setRegister(date);
+                userEntity.setRegister(userDto.getRegister());
 
-            password = userDto.getPassword();
-            passwordCodified =
+                password = userDto.getPassword();
+                passwordCodified = webSecurityConfig.passwordEncoder().encode(password);
+                userEntity.setPassword(passwordCodified);
+
+                userRepository.save(userEntity);
+                LOGGER.info("User " + userDto.getName() + " user added successfully");
+            } else {
+                LOGGER.warning("User " + userDto.getName() + " already exists in the game database");
+            }
+        } catch (Exception e){
+            LOGGER.info("Error adding user: " + e.getMessage());
         }
 
     }
