@@ -102,6 +102,7 @@ public class UserServicesImp implements IUserServicesDAO {
         return getWinnerUp;
     }
 
+    @Override
     public List<UserDTO> getAllUp(){
         List<UserDTO> getAllUp;
 
@@ -125,6 +126,7 @@ public class UserServicesImp implements IUserServicesDAO {
         return getWinnerDown;
     }
 
+    @Override
     public List<UserDTO> getAllDown(){
         List<UserDTO> getAllDown;
 

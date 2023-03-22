@@ -17,6 +17,10 @@ public interface IUserServicesDAO {
 
     public List<UserDTO> getWinnerDown(); //GET /players/ranking/loser: returns the players with the lowest percentage of games won.
 
+    public List<UserDTO> getAllUp(); //GET /players/ranking/AllFirstToLast: Shows the list of players from first to last.
+
+    public List<UserDTO> getAllDown(); ////GET /players/ranking/AllLastToFirst: Shows the list of players from last to first.
+
     public Double averageRanking(); //GET /players/ranking: returns the average ranking of the all players.
 
     boolean validationToken(int id, HttpServletRequest request); //validate player's by comparing the token id with user id.
