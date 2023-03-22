@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -91,19 +92,47 @@ public class UserServicesImp implements IUserServicesDAO {
     @Override
     public List<UserDTO> getWinnerUp() {
         //"Collections.singletonList" will only return a list object.
-        //"Double.compare" will accept the comparison between doubles.
+        //Creates a comparer that sorts the UserDTO objects by the value of the winner property in descending order.
         List<UserDTO> getWinnerUp;
 
         getWinnerUp = Collections.singletonList(userRepository.findAll().stream().map(this::convertEntityToDTO)
-                .sorted((up, down) -> Double.compare(down.getWinner(), up.getWinner()))
+                .sorted(Comparator.comparingDouble(UserDTO::getWinner).reversed())
                 .findFirst().orElse(null));
 
         return getWinnerUp;
     }
 
+    public List<UserDTO> getAllUp(){
+        List<UserDTO> getAllUp;
+
+        getAllUp = userRepository.findAll().stream().map(this::convertEntityToDTO)
+                .sorted(Comparator.comparingDouble(UserDTO::getWinner).reversed())
+                .collect(Collectors.toList());
+
+        return getAllUp;
+    }
+
     @Override
     public List<UserDTO> getWinnerDown() {
-        return null;
+        //"Collections.singletonList" will only return a list object.
+        //Creates a comparer that sorts the UserDTO objects by the value of the winner property in ascendant order.
+        List<UserDTO> getWinnerDown;
+
+        getWinnerDown = Collections.singletonList(userRepository.findAll().stream().map(this::convertEntityToDTO)
+                .sorted(Comparator.comparingDouble(UserDTO::getWinner))
+                .findFirst().orElse(null));
+
+        return getWinnerDown;
+    }
+
+    public List<UserDTO> getAllDown(){
+        List<UserDTO> getAllDown;
+
+        getAllDown = userRepository.findAll().stream().map(this::convertEntityToDTO)
+                .sorted(Comparator.comparingDouble(UserDTO::getWinner))
+                .collect(Collectors.toList());
+
+        return getAllDown;
     }
 
     @Override
