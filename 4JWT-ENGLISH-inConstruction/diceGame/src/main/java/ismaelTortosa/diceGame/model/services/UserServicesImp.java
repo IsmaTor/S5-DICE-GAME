@@ -9,8 +9,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.Collections;
 import java.util.List;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -40,7 +42,7 @@ public class UserServicesImp implements IUserServicesDAO {
                 userEntity.setPassword(passwordCodified);
 
                 userRepository.save(userEntity);
-                LOGGER.info("User " + userDto.getName() + " user added successfully");
+                LOGGER.info("User " + userDto.getName() + " added successfully");
             } else {
                 LOGGER.warning("User " + userDto.getName() + " already exists in the game database");
             }
@@ -52,17 +54,51 @@ public class UserServicesImp implements IUserServicesDAO {
 
     @Override
     public UserDTO update(int id, UserDTO userDTO) {
-        return null;
+        UserEntity userUpdate = null;
+        UserEntity userEntity;
+        String password;
+        String passwordCodified;
+
+        try{
+            if (userRepository.existsByName(userDTO.getName())) {
+                userEntity = userRepository.findById(id).orElseThrow();
+                userEntity.setName(userDTO.getName());
+
+                password = userDTO.getPassword();
+                passwordCodified = webSecurityConfig.passwordEncoder().encode(password);
+                userEntity.setPassword(passwordCodified);
+
+                userUpdate = userRepository.save(userEntity);
+                LOGGER.info("User " + userDTO.getName() + " updated successfully");
+            } else {
+                LOGGER.warning("User " + userDTO.getName() + " already exists in the game database");
+            }
+        } catch (Exception e){
+            LOGGER.info("Error updating user: " + e.getMessage());
+        }
+        return convertEntityToDTO(userUpdate);
     }
 
     @Override
     public List<UserDTO> getAll() {
-        return null;
+        List<UserDTO> getAllUsers;
+
+        getAllUsers = userRepository.findAll().stream().map(this::convertEntityToDTO).collect(Collectors.toList());
+
+        return getAllUsers;
     }
 
     @Override
     public List<UserDTO> getWinnerUp() {
-        return null;
+        //"Collections.singletonList" will only return a list object.
+        //"Double.compare" will accept the comparison between doubles.
+        List<UserDTO> getWinnerUp;
+
+        getWinnerUp = Collections.singletonList(userRepository.findAll().stream().map(this::convertEntityToDTO)
+                .sorted((up, down) -> Double.compare(down.getWinner(), up.getWinner()))
+                .findFirst().orElse(null));
+
+        return getWinnerUp;
     }
 
     @Override
@@ -78,5 +114,17 @@ public class UserServicesImp implements IUserServicesDAO {
     @Override
     public boolean validationToken(int id, HttpServletRequest request) {
         return false;
+    }
+
+    //Entity to DTO
+    private UserDTO convertEntityToDTO(UserEntity userEntity){
+       UserDTO userDTO = new UserDTO();
+
+       userDTO.setId_user(userEntity.getId_user());
+       userDTO.setName(userEntity.getName());
+       userDTO.setRegister(userEntity.getRegister());
+       userDTO.setWinner(userEntity.getWinner());
+
+       return userDTO;
     }
 }
