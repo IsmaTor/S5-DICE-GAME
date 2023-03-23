@@ -4,6 +4,8 @@ import ismaelTortosa.diceGame.model.domain.UserEntity;
 import ismaelTortosa.diceGame.model.dto.UserDTO;
 import ismaelTortosa.diceGame.model.repository.UserRepository;
 import ismaelTortosa.diceGame.model.security.configuration.WebSecurityConfig;
+import ismaelTortosa.diceGame.model.security.users.UserDetailServiceImpl;
+import ismaelTortosa.diceGame.model.security.utils.TokenUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -61,7 +63,7 @@ public class UserServicesImp implements IUserServicesDAO {
         String passwordCodified;
 
         try{
-            if (userRepository.existsByName(userDTO.getName())) {
+            if (!userRepository.existsByName(userDTO.getName())) {
                 userEntity = userRepository.findById(id).orElseThrow();
                 userEntity.setName(userDTO.getName());
 
@@ -139,12 +141,37 @@ public class UserServicesImp implements IUserServicesDAO {
 
     @Override
     public Double averageRanking() {
-        return null;
+        double average;
+
+        average = userRepository.findAll().stream()
+                .mapToDouble(playersAverage -> playersAverage.getWinner())
+                .average()
+                .orElse(0.0);
+
+        return average;
     }
 
+    //Validate the token by comparing the token id with the user id.
     @Override
     public boolean validationToken(int id, HttpServletRequest request) {
-        return false;
+        UserEntity userEntity;
+        String token;
+        int idUser;
+
+        token = UserDetailServiceImpl.getToken(request);
+        if (token == null) {
+            return false;
+        }
+
+        idUser = TokenUtils.getUserIdFromToken(token);
+        userEntity = userRepository.findById(id).orElse(null);
+
+        //if it doesn't find the user or it doesn't match it returns false.
+        if (userEntity == null || idUser != id) {
+            LOGGER.info("ERROR: The validation is incorrect, the user does not match his ID!");
+            return false;
+        }
+        return true;
     }
 
     //Entity to DTO
