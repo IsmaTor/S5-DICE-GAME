@@ -17,7 +17,6 @@ import java.util.List;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
-
 @Service
 public class UserServicesImp implements IUserServicesDAO {
     private static final Logger LOGGER = Logger.getLogger(UserServicesImp.class.getName());
@@ -37,8 +36,13 @@ public class UserServicesImp implements IUserServicesDAO {
         try {
             if (!userRepository.existsByName(userDto.getName())) {
                 userEntity.setName(userDto.getName());
-                userEntity.setRegister(date);
-                userEntity.setRegister(userDto.getRegister());
+
+                if (userDto.getRegister() == null) {
+                    userDto.setRegister(date);
+                    userEntity.setRegister(date);
+                } else {
+                    userEntity.setRegister(userDto.getRegister());
+                }
 
                 password = userDto.getPassword();
                 passwordCodified = webSecurityConfig.passwordEncoder().encode(password);
@@ -59,6 +63,7 @@ public class UserServicesImp implements IUserServicesDAO {
     public UserDTO update(int id, UserDTO userDTO) {
         UserEntity userUpdate = null;
         UserEntity userEntity;
+        LocalDate date = LocalDate.now();
         String password;
         String passwordCodified;
 
@@ -66,6 +71,13 @@ public class UserServicesImp implements IUserServicesDAO {
             if (!userRepository.existsByName(userDTO.getName())) {
                 userEntity = userRepository.findById(id).orElseThrow();
                 userEntity.setName(userDTO.getName());
+
+                if (userDTO.getRegisterUpdate() == null) {
+                    userDTO.setRegisterUpdate(date);
+                    userEntity.setRegisterUpdate(date);
+                } else {
+                    userEntity.setRegisterUpdate(userDTO.getRegisterUpdate());
+                }
 
                 password = userDTO.getPassword();
                 passwordCodified = webSecurityConfig.passwordEncoder().encode(password);
@@ -181,6 +193,7 @@ public class UserServicesImp implements IUserServicesDAO {
        userDTO.setId_user(userEntity.getId_user());
        userDTO.setName(userEntity.getName());
        userDTO.setRegister(userEntity.getRegister());
+       userDTO.setRegisterUpdate(userEntity.getRegisterUpdate());
        userDTO.setWinner(userEntity.getWinner());
 
        return userDTO;

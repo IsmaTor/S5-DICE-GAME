@@ -15,6 +15,7 @@ public class UserDTO implements Serializable {
     private int id_user;
     private String name = "Anonymous";
     private LocalDate register;
+    private LocalDate registerUpdate;
     private double winner;
     private String password;
     private static int counter = 1;
