@@ -54,7 +54,7 @@ public class UserServicesImp implements IUserServicesDAO {
                 LOGGER.warning("User " + userDto.getName() + " already exists in the game database");
             }
         } catch (Exception e){
-            LOGGER.info("Error adding user: " + e.getMessage());
+            LOGGER.warning("Error adding user: " + e.getMessage());
         }
 
     }
@@ -89,7 +89,7 @@ public class UserServicesImp implements IUserServicesDAO {
                 LOGGER.warning("User " + userDTO.getName() + " already exists in the game database");
             }
         } catch (Exception e){
-            LOGGER.info("Error updating user: " + e.getMessage());
+            LOGGER.warning("Error updating user: " + e.getMessage());
         }
         return convertEntityToDTO(userUpdate);
     }
