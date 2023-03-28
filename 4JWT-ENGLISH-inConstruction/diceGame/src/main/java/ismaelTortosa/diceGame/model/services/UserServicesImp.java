@@ -2,6 +2,7 @@ package ismaelTortosa.diceGame.model.services;
 
 import ismaelTortosa.diceGame.model.domain.UserEntity;
 import ismaelTortosa.diceGame.model.dto.UserDTO;
+import ismaelTortosa.diceGame.model.mistakes.DuplicateNameException;
 import ismaelTortosa.diceGame.model.repository.UserRepository;
 import ismaelTortosa.diceGame.model.security.configuration.WebSecurityConfig;
 import ismaelTortosa.diceGame.model.security.users.UserDetailServiceImpl;
@@ -27,7 +28,7 @@ public class UserServicesImp implements IUserServicesDAO {
     private WebSecurityConfig webSecurityConfig;
 
     @Override
-    public void add(UserDTO userDto) {
+    public void add(UserDTO userDto) throws DuplicateNameException {
         UserEntity userEntity = new UserEntity();
         LocalDate date = LocalDate.now();
         String password;
@@ -52,6 +53,7 @@ public class UserServicesImp implements IUserServicesDAO {
                 LOGGER.info("User " + userDto.getName() + " added successfully");
             } else {
                 LOGGER.warning("User " + userDto.getName() + " already exists in the game database");
+                throw new DuplicateNameException("User with name " + userDto.getName() + " already exists in the game database");
             }
         } catch (Exception e){
             LOGGER.warning("Error adding user: " + e.getMessage());

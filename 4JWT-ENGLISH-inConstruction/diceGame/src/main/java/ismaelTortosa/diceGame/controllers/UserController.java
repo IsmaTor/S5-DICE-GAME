@@ -1,6 +1,9 @@
 package ismaelTortosa.diceGame.controllers;
 
 import ismaelTortosa.diceGame.model.dto.UserDTO;
+import ismaelTortosa.diceGame.model.mistakes.DuplicateNameException;
+import ismaelTortosa.diceGame.model.mistakes.ErrorResponseMessage;
+import ismaelTortosa.diceGame.model.repository.UserRepository;
 import ismaelTortosa.diceGame.model.services.IUserServicesDAO;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,18 +19,33 @@ import java.util.logging.Logger;
 @RequestMapping("/players")
 public class UserController {
     private static final Logger LOGGER = Logger.getLogger(UserController.class.getName());
+    private ErrorResponseMessage errorResponse;
 
+    @Autowired
+    private UserRepository userRepository;
     @Autowired
     private IUserServicesDAO userServices;
 
     @PostMapping(path= "/add") //http://localhost:9001/players/add
     public ResponseEntity<?> addUser(@RequestBody UserDTO userDTO){
-        try{
-            userServices.add(userDTO);
-            LOGGER.info("User " + userDTO.getName() + " registered successfully.");
-            return new ResponseEntity<>(userDTO, HttpStatus.CREATED);
+        try {
+            if (userRepository.existsByName(userDTO.getName())) {
+                errorResponse = new ErrorResponseMessage(HttpStatus.BAD_REQUEST.value(), "User not created.", "User with this name already exists.");
+                LOGGER.warning("User not created. User with name " + userDTO.getName() + " already exists.");
+                return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+            } else {
+                userServices.add(userDTO);
+                LOGGER.info("User " + userDTO.getName() + " registered successfully.");
+                return new ResponseEntity<>(userDTO, HttpStatus.CREATED);
+            }
+        } catch (DuplicateNameException e) {
+            errorResponse = new ErrorResponseMessage(HttpStatus.BAD_REQUEST.value(), "User not created.", "User with this name already exists.");
+            LOGGER.warning("User not created. " + e);
+            return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
         } catch (Exception e) {
-            return new ResponseEntity<>("There are no players in the system. " + e, HttpStatus.INTERNAL_SERVER_ERROR);
+            errorResponse = new ErrorResponseMessage(HttpStatus.INTERNAL_SERVER_ERROR.value(), "User not created.", "Failed to create user in database.");
+            LOGGER.warning("User not created. " + e);
+            return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -40,17 +58,24 @@ public class UserController {
             validated = userServices.validationToken(id, request);
 
             if(validated){
-                userUpdated = userServices.update(id, userDTO);
-                LOGGER.info("User " + userDTO.getName() + " it has been updated.");
-                return new ResponseEntity<>(userUpdated, HttpStatus.OK);
+                if(userRepository.existsByName(userDTO.getName())){
+                    errorResponse = new ErrorResponseMessage(HttpStatus.NOT_MODIFIED.value(), "User not created.", "User with this name already exists.");
+                    LOGGER.warning("User not created. User with name " + userDTO.getName() + " already exists.");
+                    return new ResponseEntity<>(errorResponse, HttpStatus.NOT_MODIFIED);
+                } else {
+                    userUpdated = userServices.update(id, userDTO);
+                    LOGGER.info("User " + userDTO.getName() + " it has been updated.");
+                    return new ResponseEntity<>(userUpdated, HttpStatus.OK);
+                }
             } else {
-                ResponseEntity.status(HttpStatus.NOT_FOUND).body("ERROR: The ID is not found.");
+                errorResponse = new ErrorResponseMessage(HttpStatus.NOT_FOUND.value(), "ERROR ID.", "ERROR: The ID is not found or TOKEN incorrect.");
+                return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
             }
         } catch (Exception e){
-            LOGGER.info("ERROR: User update not possible. " + e);
+            LOGGER.warning("ERROR: User update not possible. " + e);
+            errorResponse = new ErrorResponseMessage(HttpStatus.INTERNAL_SERVER_ERROR.value(), "ERROR: User update not possible.", "Fail of the game or data base system.");
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
     }
 
     @GetMapping(path= "/getAll") //http://localhost:9001/players/getAll
