@@ -63,4 +63,12 @@ public class TokenUtils {
         return userId; //Returns only the id.
     }
 
+    //Get token. Method not used.
+    public static Object getUserToken(String token){
+        Claims claims = PARSER
+                .parseClaimsJws(token)
+                .getBody();
+        return claims;
+    }
+
 }

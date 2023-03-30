@@ -1,8 +1,9 @@
 package ismaelTortosa.diceGame.model.services;
 
+import io.jsonwebtoken.Claims;
 import ismaelTortosa.diceGame.model.domain.UserEntity;
 import ismaelTortosa.diceGame.model.dto.UserDTO;
-import ismaelTortosa.diceGame.model.mistakes.DuplicateNameException;
+import ismaelTortosa.diceGame.model.exceptions.DuplicateNameException;
 import ismaelTortosa.diceGame.model.repository.UserRepository;
 import ismaelTortosa.diceGame.model.security.configuration.WebSecurityConfig;
 import ismaelTortosa.diceGame.model.security.users.UserDetailServiceImpl;
@@ -185,6 +186,26 @@ public class UserServicesImp implements IUserServicesDAO {
             LOGGER.info("ERROR: The validation is incorrect, the user does not match his ID!");
             return false;
         }
+        return true;
+    }
+
+    //Validate token whith token request. Not used.
+    @Override
+    public boolean checkToken(HttpServletRequest request) {
+        String token = UserDetailServiceImpl.getToken(request);
+
+        if (token == null) {
+            return false;
+        }
+
+        Claims tokenClaims = (Claims) TokenUtils.getUserToken(token);
+        String tokenSubject = tokenClaims.getSubject();
+
+        if (!tokenSubject.equals(tokenClaims.get("sub"))) {
+            LOGGER.info("ERROR: Token is not valid.");
+            return false;
+        }
+
         return true;
     }
 

@@ -1,7 +1,7 @@
 package ismaelTortosa.diceGame.controllers;
 
 import ismaelTortosa.diceGame.model.domain.PlayEntity;
-import ismaelTortosa.diceGame.model.mistakes.ErrorResponseMessage;
+import ismaelTortosa.diceGame.model.exceptions.ErrorResponseMessage;
 import ismaelTortosa.diceGame.model.services.IPlayServicesDAO;
 import ismaelTortosa.diceGame.model.services.IUserServicesDAO;
 import jakarta.servlet.http.HttpServletRequest;

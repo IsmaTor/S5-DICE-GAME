@@ -36,8 +36,13 @@ public class WebSecurityConfig {
                 .csrf()
                 .disable()
                 .authorizeHttpRequests()
-                .requestMatchers("/players/add")
-                .permitAll()
+                .requestMatchers("/players/add").permitAll()
+                .requestMatchers("/players/getAll").permitAll()
+                .requestMatchers("/players/getAllUp").permitAll()
+                .requestMatchers("/players/getAllDown").permitAll()
+                .requestMatchers("/players/getUp").permitAll()
+                .requestMatchers("/players/getDown").permitAll()
+                .requestMatchers("/players/getAverage").permitAll()
                 .anyRequest()
                 .authenticated()
                 .and()
@@ -66,3 +71,4 @@ public class WebSecurityConfig {
         return new BCryptPasswordEncoder();
     }
 }
+

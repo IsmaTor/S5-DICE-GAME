@@ -1,4 +1,4 @@
-package ismaelTortosa.diceGame.model.mistakes;
+package ismaelTortosa.diceGame.model.exceptions;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

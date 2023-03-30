@@ -1,10 +1,11 @@
 package ismaelTortosa.diceGame.controllers;
 
 import ismaelTortosa.diceGame.model.dto.UserDTO;
-import ismaelTortosa.diceGame.model.mistakes.DuplicateNameException;
-import ismaelTortosa.diceGame.model.mistakes.ErrorResponseMessage;
+import ismaelTortosa.diceGame.model.exceptions.DuplicateNameException;
+import ismaelTortosa.diceGame.model.exceptions.ErrorResponseMessage;
 import ismaelTortosa.diceGame.model.repository.UserRepository;
 import ismaelTortosa.diceGame.model.services.IUserServicesDAO;
+
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -71,23 +72,59 @@ public class UserController {
                 errorResponse = new ErrorResponseMessage(HttpStatus.NOT_FOUND.value(), "ERROR ID.", "ERROR: The ID is not found or TOKEN incorrect.");
                 return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
             }
+        }catch (DuplicateNameException e) {
+            errorResponse = new ErrorResponseMessage(HttpStatus.BAD_REQUEST.value(), "User not modified.", "User with this name already exists.");
+            LOGGER.warning("User not modified. " + e);
+            return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
         } catch (Exception e){
             LOGGER.warning("ERROR: User update not possible. " + e);
             errorResponse = new ErrorResponseMessage(HttpStatus.INTERNAL_SERVER_ERROR.value(), "ERROR: User update not possible.", "Fail of the game or data base system.");
-            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
-    @GetMapping(path= "/getAll") //http://localhost:9001/players/getAll
-    public ResponseEntity<?> getAllUsers(){
+    @GetMapping(path = "/getAll") //http://localhost:9001/players/getAll
+    public ResponseEntity<?> getAllUsers(HttpServletRequest request) {
         List<UserDTO> users;
 
-        try{
+        try {
             users = userServices.getAll();
             LOGGER.info("User list: " + users.toString());
             return new ResponseEntity<>(users, HttpStatus.OK);
+        }  catch (Exception e) {
+            LOGGER.warning("It has not been possible to show the list of game players. " + e);
+            errorResponse = new ErrorResponseMessage(HttpStatus.INTERNAL_SERVER_ERROR.value(), "Players not shown.", "It has not been possible to show the list of game players.");
+            return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @GetMapping(path= "/getAllUp") //http://localhost:9001/players/getAllUp
+    public ResponseEntity<?> getAllUpUsers(){
+        List<UserDTO> users;
+
+        try{
+            users = userServices.getAllUp();
+            LOGGER.info("User list: " + users.toString());
+            return new ResponseEntity<>(users, HttpStatus.OK);
         } catch (Exception e){
-            return new ResponseEntity<>("There are no players in the system. " + e, HttpStatus.INTERNAL_SERVER_ERROR);
+            LOGGER.warning("It has not been possible to show the list of game players. " + e);
+            errorResponse = new ErrorResponseMessage(HttpStatus.INTERNAL_SERVER_ERROR.value(), "Players not shown.", "It has not been possible to show the list of game players.");
+            return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @GetMapping(path= "/getAllDown") //http://localhost:9001/players/getAllUp
+    public ResponseEntity<?> getAllDownUsers(){
+        List<UserDTO> users;
+
+        try{
+            users = userServices.getAllDown();
+            LOGGER.info("User list: " + users.toString());
+            return new ResponseEntity<>(users, HttpStatus.OK);
+        } catch (Exception e){
+            LOGGER.warning("It has not been possible to show the list of game players. " + e);
+            errorResponse = new ErrorResponseMessage(HttpStatus.INTERNAL_SERVER_ERROR.value(), "Players not shown.", "It has not been possible to show the list of game players.");
+            return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -100,20 +137,9 @@ public class UserController {
             LOGGER.info("First position: " + rankingUp);
             return new ResponseEntity<>(rankingUp, HttpStatus.OK);
         } catch (Exception e){
-            return new ResponseEntity<>("Ranking not found. " + e, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
-
-    @GetMapping(path= "/getListUp") //http://localhost:9001/players/getListUp
-    public ResponseEntity<?> getListUpUsers(){
-        List<UserDTO> rankingUpList;
-
-        try{
-            rankingUpList = userServices.getAllUp();
-            LOGGER.info("List of positions in ascending order. " + rankingUpList);
-            return new ResponseEntity<>(rankingUpList, HttpStatus.OK);
-        } catch (Exception e){
-            return new ResponseEntity<>("Ranking not found. " + e, HttpStatus.INTERNAL_SERVER_ERROR);
+            LOGGER.warning("It has not been possible to show the first player. " + e);
+            errorResponse = new ErrorResponseMessage(HttpStatus.INTERNAL_SERVER_ERROR.value(), "First player not shown.", "It has not been possible to show the first of game players.");
+            return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -126,20 +152,9 @@ public class UserController {
             LOGGER.info("Last position: " + rankingDown);
             return new ResponseEntity<>(rankingDown, HttpStatus.OK);
         } catch (Exception e){
-            return new ResponseEntity<>("Ranking not found. " + e, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
-
-    @GetMapping(path= "/getListDown") //http://localhost:9001/players/getListDown
-    public ResponseEntity<?> getListDownUsers(){
-        List<UserDTO> rankingDownList;
-
-        try{
-            rankingDownList = userServices.getAllDown();
-            LOGGER.info("List of positions in descendent order: " + rankingDownList);
-            return new ResponseEntity<>(rankingDownList, HttpStatus.OK);
-        } catch (Exception e){
-            return new ResponseEntity<>("Ranking not found. " + e, HttpStatus.INTERNAL_SERVER_ERROR);
+            LOGGER.warning("It has not been possible to show the last player. " + e);
+            errorResponse = new ErrorResponseMessage(HttpStatus.INTERNAL_SERVER_ERROR.value(), "Last player not shown.", "It has not been possible to show the last of game players.");
+            return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -150,9 +165,18 @@ public class UserController {
         try{
             average = userServices.averageRanking();
             LOGGER.info("Average of all players: " + average + " %.");
-            return new ResponseEntity<>(average + " %", HttpStatus.OK);
+            if(average < 10){
+                return new ResponseEntity<>(average + " % OF GAMES WON. LOW INDEX OF GAMES WON.", HttpStatus.OK);
+            } else if (average >= 10 && average <30 ) {
+                return new ResponseEntity<>(average + " % OF GAMES WON. MIDDLE INDEX OF GAMES WON.", HttpStatus.OK);
+            } else {
+                return new ResponseEntity<>(average + " % OF GAMES WON. HIGH INDEX OF GAMES WON.", HttpStatus.OK);
+            }
+
         } catch (Exception e){
-            return new ResponseEntity<>("Averages not found. " + e, HttpStatus.INTERNAL_SERVER_ERROR);
+            LOGGER.warning("Averages not found. " + e);
+            errorResponse = new ErrorResponseMessage(HttpStatus.INTERNAL_SERVER_ERROR.value(), "Average not found.", "It has not been possible to show the average of game players.");
+            return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 }
