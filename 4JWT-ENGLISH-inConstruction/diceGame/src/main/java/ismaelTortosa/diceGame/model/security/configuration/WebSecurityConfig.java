@@ -26,7 +26,6 @@ public class WebSecurityConfig {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http, AuthenticationManager authenticationManager) throws Exception{
-
         JWTAuthenticationFilter jwtAuthenticationFilter = new JWTAuthenticationFilter();
 
         jwtAuthenticationFilter.setAuthenticationManager(authenticationManager);
@@ -70,5 +69,6 @@ public class WebSecurityConfig {
 
         return new BCryptPasswordEncoder();
     }
+
 }
 
