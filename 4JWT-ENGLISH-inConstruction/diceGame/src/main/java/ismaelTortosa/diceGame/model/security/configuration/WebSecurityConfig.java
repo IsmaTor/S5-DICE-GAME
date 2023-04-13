@@ -42,6 +42,7 @@ public class WebSecurityConfig {
                 .requestMatchers("/players/getUp").permitAll()
                 .requestMatchers("/players/getDown").permitAll()
                 .requestMatchers("/players/getAverage").permitAll()
+                .requestMatchers("/players/getOne/{id}").permitAll()
                 .anyRequest()
                 .authenticated()
                 .and()

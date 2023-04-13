@@ -1,13 +1,12 @@
 package ismaelTortosa.diceGame.model.services;
 
 import ismaelTortosa.diceGame.model.domain.PlayEntity;
-import ismaelTortosa.diceGame.model.dto.UserDTO;
 
 import java.util.List;
 
 public interface IPlayServicesDAO {
 
-    public void deletePlay(int id, UserDTO userDTO); //DELETE /players/{id}/games: removes a player's plays.
+    public List<Integer> deletePlay(int id); //DELETE /players/{id}/games: removes a player's plays.
 
     public PlayEntity getPlay(int id); //POST /players/{id}/games: one player play in the game.
 
