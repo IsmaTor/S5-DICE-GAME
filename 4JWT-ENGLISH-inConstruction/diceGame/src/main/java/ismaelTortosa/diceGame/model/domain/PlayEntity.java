@@ -28,12 +28,25 @@ public class PlayEntity implements Serializable {
     @JoinColumn(name = "id_user")
     private UserEntity userEntity;
 
+    @ManyToOne
+    @JoinColumn(name = "id_admin")
+    private AdminEntity adminEntity;
+
     //Constructor to create the plays
     public PlayEntity(UserEntity userEntity){
         this.dice1 = randomNumber();
         this.dice2 = randomNumber();
         this.result = playResult();
         this.userEntity = userEntity;
+    }
+
+    //Constructor to create the plays for admin
+    public PlayEntity(UserEntity userEntity ,AdminEntity adminEntity){
+        this.dice1 = randomNumber();
+        this.dice2 = randomNumber();
+        this.result = playResult();
+        this.userEntity = userEntity;
+        this.adminEntity = adminEntity;
     }
 
     //Create die roll

@@ -22,6 +22,9 @@ public class UserController {
     private static final Logger LOGGER = Logger.getLogger(UserController.class.getName());
     private ErrorResponseMessage errorResponse;
 
+    //variables
+    private List<UserDTO> usersList;
+
     @Autowired
     private UserRepository userRepository;
     @Autowired
@@ -85,12 +88,11 @@ public class UserController {
 
     @GetMapping(path = "/getAll") //http://localhost:9001/players/getAll
     public ResponseEntity<?> getAllUsers(HttpServletRequest request) {
-        List<UserDTO> users;
 
         try {
-            users = userServices.getAll();
-            LOGGER.info("User list: " + users.toString());
-            return new ResponseEntity<>(users, HttpStatus.OK);
+            usersList = userServices.getAll();
+            LOGGER.info("User list: " + usersList.toString());
+            return new ResponseEntity<>(usersList, HttpStatus.OK);
         }  catch (Exception e) {
             LOGGER.warning("It has not been possible to show the list of game players. " + e);
             errorResponse = new ErrorResponseMessage(HttpStatus.INTERNAL_SERVER_ERROR.value(), "Players not shown.", "It has not been possible to show the list of game players.");
@@ -100,12 +102,11 @@ public class UserController {
 
     @GetMapping(path= "/getAllUp") //http://localhost:9001/players/getAllUp
     public ResponseEntity<?> getAllUpUsers(){
-        List<UserDTO> users;
 
         try{
-            users = userServices.getAllUp();
-            LOGGER.info("User list: " + users.toString());
-            return new ResponseEntity<>(users, HttpStatus.OK);
+            usersList = userServices.getAllUp();
+            LOGGER.info("User list: " + usersList.toString());
+            return new ResponseEntity<>(usersList, HttpStatus.OK);
         } catch (Exception e){
             LOGGER.warning("It has not been possible to show the list of game players. " + e);
             errorResponse = new ErrorResponseMessage(HttpStatus.INTERNAL_SERVER_ERROR.value(), "Players not shown.", "It has not been possible to show the list of game players.");
@@ -115,12 +116,11 @@ public class UserController {
 
     @GetMapping(path= "/getAllDown") //http://localhost:9001/players/getAllUp
     public ResponseEntity<?> getAllDownUsers(){
-        List<UserDTO> users;
 
         try{
-            users = userServices.getAllDown();
-            LOGGER.info("User list: " + users.toString());
-            return new ResponseEntity<>(users, HttpStatus.OK);
+            usersList = userServices.getAllDown();
+            LOGGER.info("User list: " + usersList.toString());
+            return new ResponseEntity<>(usersList, HttpStatus.OK);
         } catch (Exception e){
             LOGGER.warning("It has not been possible to show the list of game players. " + e);
             errorResponse = new ErrorResponseMessage(HttpStatus.INTERNAL_SERVER_ERROR.value(), "Players not shown.", "It has not been possible to show the list of game players.");
@@ -130,12 +130,11 @@ public class UserController {
 
     @GetMapping(path= "/getUp") //http://localhost:9001/players/getUp
     public ResponseEntity<?> getUpUser(){
-        List<UserDTO> rankingUp;
 
         try{
-            rankingUp = userServices.getWinnerUp();
-            LOGGER.info("First position: " + rankingUp);
-            return new ResponseEntity<>(rankingUp, HttpStatus.OK);
+            usersList = userServices.getWinnerUp();
+            LOGGER.info("First position: " + usersList);
+            return new ResponseEntity<>(usersList, HttpStatus.OK);
         } catch (Exception e){
             LOGGER.warning("It has not been possible to show the first player. " + e);
             errorResponse = new ErrorResponseMessage(HttpStatus.INTERNAL_SERVER_ERROR.value(), "First player not shown.", "It has not been possible to show the first of game players.");
@@ -145,12 +144,11 @@ public class UserController {
 
     @GetMapping(path= "/getDown") //http://localhost:9001/players/getDown
     public ResponseEntity<?> getDownUser(){
-        List<UserDTO> rankingDown;
 
         try{
-            rankingDown = userServices.getWinnerDown();
-            LOGGER.info("Last position: " + rankingDown);
-            return new ResponseEntity<>(rankingDown, HttpStatus.OK);
+            usersList = userServices.getWinnerDown();
+            LOGGER.info("Last position: " + usersList);
+            return new ResponseEntity<>(usersList, HttpStatus.OK);
         } catch (Exception e){
             LOGGER.warning("It has not been possible to show the last player. " + e);
             errorResponse = new ErrorResponseMessage(HttpStatus.INTERNAL_SERVER_ERROR.value(), "Last player not shown.", "It has not been possible to show the last of game players.");

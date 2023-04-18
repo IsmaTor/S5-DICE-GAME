@@ -23,7 +23,7 @@ public interface IUserServicesDAO {
 
     public Double averageRanking(); //GET /players/ranking: returns the average ranking of the all players.
 
-    boolean validationToken(int id, HttpServletRequest request); //validate player's by comparing the token id with user id.
+    boolean validationToken(int id, HttpServletRequest request); //Validate player's by comparing the token id with user id.
 
     public boolean checkToken(HttpServletRequest request); //validate the token user with the token received by the request. Not used.
 }

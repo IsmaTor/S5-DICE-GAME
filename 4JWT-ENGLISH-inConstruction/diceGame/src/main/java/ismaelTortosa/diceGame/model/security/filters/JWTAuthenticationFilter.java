@@ -2,6 +2,7 @@ package ismaelTortosa.diceGame.model.security.filters;
 
 import ismaelTortosa.diceGame.model.exceptions.ErrorResponseLoginMessage;
 import ismaelTortosa.diceGame.model.security.credentials.AuthCredentials;
+import ismaelTortosa.diceGame.model.security.users.AdminDetailsImpl;
 import ismaelTortosa.diceGame.model.security.users.UserDetailsImpl;
 import ismaelTortosa.diceGame.model.security.utils.TokenUtils;
 
@@ -14,7 +15,7 @@ import jakarta.servlet.http.HttpSession;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
@@ -84,7 +85,6 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
                 session.setAttribute("failedAttempts", failedAttempts); //Update the value of failedAttempts in the session.
             }
         }
-
         Authentication authentication;
         try {
             authentication = getAuthenticationManager().authenticate(usernamePasswordAuthenticationToken);
@@ -94,9 +94,7 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
             LOGGER.info("Username: " + authCredentials.getName() + " has entered the password incorrectly.");
             failedAttempts++;
             remainingAttempts = MAX_FAILED_ATTEMPTS - failedAttempts;
-
             LOGGER.info("Remain " + remainingAttempts + " attempts before account is locked.");
-
             session.setAttribute("failedAttempts", failedAttempts); //Update the value of failedAttempts in the session.
 
             if (remainingAttempts <= 0) {
@@ -114,17 +112,21 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
                 throw new BadCredentialsException("Your account has been locked due to too many failed attempts. Wait " + remainingAttempts + " attempts before account is locked.");
             }
         }
-
         LOGGER.info("Username: " + authCredentials.getName() + " is in the game.");
         return authentication;
     }
 
     @Override
     protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authResult) throws IOException, ServletException{
-        String token;
+        String token = "";
 
-        UserDetailsImpl userDetails = (UserDetailsImpl) authResult.getPrincipal();
-        token = TokenUtils.createToken(userDetails.getIdUser(), userDetails.getUsername(), userDetails.getPassword());
+        if (authResult.getPrincipal() instanceof AdminDetailsImpl) { //Token for administrator.
+            AdminDetailsImpl adminDetails = (AdminDetailsImpl) authResult.getPrincipal();
+            token = TokenUtils.createTokenAdmin(adminDetails.getIdAdmin(), adminDetails.getUsername(), adminDetails.getPassword(), adminDetails.getRol());
+        } else if (authResult.getPrincipal() instanceof UserDetailsImpl) { //Token for user.
+            UserDetailsImpl userDetails = (UserDetailsImpl) authResult.getPrincipal();
+            token = TokenUtils.createToken(userDetails.getIdUser(), userDetails.getUsername(), userDetails.getPassword());
+        }
 
         response.addHeader("Authorization", "Bearer " + token);
         response.getWriter().flush();
@@ -153,7 +155,6 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
                 errorResponseJson = objectMapper.writeValueAsString(errorResponse);
                 response.setContentType(appJson); //Indicates that the response is a JSON object.
                 response.getWriter().write(errorResponseJson);
-
             } else {
                 //If the number of failed attempts has not been recorded, it displays a generic error message.
                 response.setStatus(HttpStatus.UNAUTHORIZED.value());

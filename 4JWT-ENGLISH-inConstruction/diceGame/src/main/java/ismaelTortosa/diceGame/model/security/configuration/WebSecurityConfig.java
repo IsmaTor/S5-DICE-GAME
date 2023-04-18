@@ -1,7 +1,10 @@
 package ismaelTortosa.diceGame.model.security.configuration;
 
+import ismaelTortosa.diceGame.model.domain.AdminEntity;
 import ismaelTortosa.diceGame.model.security.filters.JWTAuthenticationFilter;
 import ismaelTortosa.diceGame.model.security.filters.JWTAuthorizationFilter;
+import ismaelTortosa.diceGame.model.security.users.ManagementDetailServiceImpl;
+
 import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -9,8 +12,8 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -19,10 +22,15 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @Configuration
 @AllArgsConstructor
 @EnableWebSecurity
-public class WebSecurityConfig {
+public class WebSecurityConfig  {
 
-    private final UserDetailsService userDetailsService;
+    private final ManagementDetailServiceImpl managementDetailService;
     private final JWTAuthorizationFilter jwtAuthorizationFilter;
+
+    @Bean
+    public AdminEntity adminEntity() {
+        return new AdminEntity();
+    }
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http, AuthenticationManager authenticationManager) throws Exception{
@@ -35,6 +43,7 @@ public class WebSecurityConfig {
                 .csrf()
                 .disable()
                 .authorizeHttpRequests()
+                .requestMatchers("/admins/add").permitAll()
                 .requestMatchers("/players/add").permitAll()
                 .requestMatchers("/players/getAll").permitAll()
                 .requestMatchers("/players/getAllUp").permitAll()
@@ -42,7 +51,6 @@ public class WebSecurityConfig {
                 .requestMatchers("/players/getUp").permitAll()
                 .requestMatchers("/players/getDown").permitAll()
                 .requestMatchers("/players/getAverage").permitAll()
-                .requestMatchers("/players/getOne/{id}").permitAll()
                 .anyRequest()
                 .authenticated()
                 .and()
@@ -58,11 +66,10 @@ public class WebSecurityConfig {
     public AuthenticationManager authenticationManager(HttpSecurity httpSecurity) throws Exception{
 
         return httpSecurity.getSharedObject(AuthenticationManagerBuilder.class)
-                .userDetailsService(userDetailsService)
+                .userDetailsService(managementDetailService)
                 .passwordEncoder(passwordEncoder())
                 .and()
                 .build();
-
     }
 
     @Bean

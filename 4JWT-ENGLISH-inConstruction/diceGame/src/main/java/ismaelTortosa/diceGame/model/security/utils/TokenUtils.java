@@ -3,11 +3,10 @@ package ismaelTortosa.diceGame.model.security.utils;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public class TokenUtils {
 
@@ -31,6 +30,33 @@ public class TokenUtils {
         return BUILDER.setSubject(name)
                 .addClaims(extra)
                 .compact();
+    }
+
+    //Token admin creation
+    public static String createTokenAdmin(int id, String name, String password, String rol) {
+        Map<String, Object> extra = new HashMap<>();
+        extra.put("name", name);
+        extra.put("rol", rol);
+
+        return BUILDER.setSubject(name)
+                .addClaims(extra)
+                .compact();
+    }
+
+    public static UsernamePasswordAuthenticationToken getAuthenticationAdmin(String token) {
+        try {
+            Claims claims = PARSER.parseClaimsJws(token).getBody();
+
+            String name = claims.getSubject();
+            String role = (String) claims.get("rol");
+
+            List<GrantedAuthority> authorities = new ArrayList<>();
+            authorities.add(new SimpleGrantedAuthority(role));
+
+            return new UsernamePasswordAuthenticationToken(name, null, authorities);
+        } catch (JwtException e) {
+            return null;
+        }
     }
 
     //Token authentication.
@@ -61,6 +87,21 @@ public class TokenUtils {
 
         int userId = (int) userIdObject;
         return userId; //Returns only the id.
+    }
+
+    //The token rol is used.
+    public static String getAccessFromToken(String token){
+        Claims claims = PARSER
+                .parseClaimsJws(token)
+                .getBody();
+
+        Object adminAccessObject = claims.get("rol");
+        if(adminAccessObject == null){
+            throw  new IllegalArgumentException("No role admin.");
+        }
+
+        String adminAccess = (String) adminAccessObject;
+        return adminAccess;
     }
 
     //Get token. Method not used.
