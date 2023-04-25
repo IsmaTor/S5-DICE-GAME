@@ -189,6 +189,29 @@ public class UserServicesImp implements IUserServicesDAO {
         return true;
     }
 
+    //nuevo
+    @Override
+    public boolean validateRolUserAccess(int id, String token, HttpServletRequest request){
+        UserEntity userEntity;
+        String rolUser;
+
+        token = UserDetailServiceImpl.getToken(request);
+
+        if (token == null) {
+            return false;
+        }
+
+        rolUser = TokenUtils.getAccessFromTokenRolUser(token);
+        userEntity = userRepository.findById(id).orElse(null);
+
+        //if it doesn't find the user or it doesn't match it returns false.
+        if (userEntity == null || !rolUser.equals("user")) {
+            LOGGER.info("ERROR: The validation is incorrect, the user does not match his ID!");
+            return false;
+        }
+        return true;
+    }
+
     //Validate token whith token request. Not used.
     @Override
     public boolean checkToken(HttpServletRequest request) {

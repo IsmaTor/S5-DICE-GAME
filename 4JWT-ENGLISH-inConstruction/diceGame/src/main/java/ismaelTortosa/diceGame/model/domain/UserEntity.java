@@ -17,7 +17,7 @@ public class UserEntity implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    //attributes
+    //attributes & variables
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private int id_user;
@@ -29,5 +29,6 @@ public class UserEntity implements Serializable {
     private LocalDate registerUpdate;
     private String password;
     private double winner;
+    private final String rolUser = "user";
 
 }

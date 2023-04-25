@@ -22,7 +22,7 @@ public class PlayController {
     private ErrorResponseMessage errorResponse;
 
     //variables
-    boolean validated;
+    boolean validated, validatedRolUser;
 
     @Autowired
     private IPlayServicesDAO playServices;
@@ -33,10 +33,13 @@ public class PlayController {
     public ResponseEntity<?> diceGame(@PathVariable("id") int id, HttpServletRequest request){
         PlayEntity throwDice;
 
+        String token = request.getHeader("Authorization");
+
         try{
             validated = userServices.validationToken(id, request); //If there is an error in the validation method it will jump 500 (INTERNAL SERVER ERROR).
+            validatedRolUser = userServices.validateRolUserAccess(id, token, request);
 
-            if(validated){
+            if(validated && validatedRolUser){
                 throwDice = playServices.getPlay(id);
                 LOGGER.info("Dice 1: " + throwDice.getDice1() + "+ Dice 2: " + throwDice.getDice2()
                         + " = " + throwDice.playResult());

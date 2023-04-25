@@ -22,10 +22,11 @@ public class TokenUtils {
     private static final JwtBuilder BUILDER = Jwts.builder().setSubject("").setExpiration(EXPIRATION_DATE).signWith(Keys.hmacShaKeyFor(SIGNING_KEY));
 
     //Token creation.
-    public static String createToken(int id, String name, String password){
+    public static String createToken(int id, String name, String password, String rolUser){
         Map<String, Object> extra = new HashMap<>();
         extra.put("name", name);
         extra.put("id", id);
+        extra.put("rolUser", rolUser);
 
         return BUILDER.setSubject(name)
                 .addClaims(extra)
@@ -37,6 +38,7 @@ public class TokenUtils {
         Map<String, Object> extra = new HashMap<>();
         extra.put("name", name);
         extra.put("rol", rol);
+        extra.put("id", id);
 
         return BUILDER.setSubject(name)
                 .addClaims(extra)
@@ -102,6 +104,20 @@ public class TokenUtils {
 
         String adminAccess = (String) adminAccessObject;
         return adminAccess;
+    }
+
+    public static String getAccessFromTokenRolUser(String token){
+        Claims claims = PARSER
+                .parseClaimsJws(token)
+                .getBody();
+
+        Object userAccessObject = claims.get("rolUser");
+        if(userAccessObject == null){
+            throw  new IllegalArgumentException("No role user.");
+        }
+
+        String userAccess = (String) userAccessObject;
+        return userAccess;
     }
 
     //Get token. Method not used.

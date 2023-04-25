@@ -25,5 +25,7 @@ public interface IUserServicesDAO {
 
     boolean validationToken(int id, HttpServletRequest request); //Validate player's by comparing the token id with user id.
 
+    public boolean validateRolUserAccess(int id, String token, HttpServletRequest request); //Validate player's by comparing the token id with user id.
+
     public boolean checkToken(HttpServletRequest request); //validate the token user with the token received by the request. Not used.
 }

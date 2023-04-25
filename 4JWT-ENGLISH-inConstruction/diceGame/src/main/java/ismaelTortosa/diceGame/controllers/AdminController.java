@@ -29,18 +29,18 @@ public class AdminController {
     public ResponseEntity<?> addUser(@RequestBody AdminDTO adminDTO){
         try {
             if (adminRepository.existsByName(adminDTO.getName())) {
-                errorResponse = new ErrorResponseMessage(HttpStatus.BAD_REQUEST.value(), "User not created.", "User with this name already exists.");
+                errorResponse = new ErrorResponseMessage(HttpStatus.NOT_MODIFIED.value(), "User not created.", "User with this name already exists.");
                 LOGGER.warning("User not created. User with name " + adminDTO.getName() + " already exists.");
-                return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+                return new ResponseEntity<>(errorResponse, HttpStatus.NOT_MODIFIED);
             } else {
                 adminServices.add(adminDTO);
                 LOGGER.info("User " + adminDTO.getName() + " registered successfully.");
                 return new ResponseEntity<>(adminDTO, HttpStatus.CREATED);
             }
         } catch (DuplicateNameException e) {
-            errorResponse = new ErrorResponseMessage(HttpStatus.BAD_REQUEST.value(), "User not created.", "User with this name already exists.");
+            errorResponse = new ErrorResponseMessage(HttpStatus.NOT_MODIFIED.value(), "User not created.", "User with this name already exists.");
             LOGGER.warning("User not created. " + e);
-            return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(errorResponse, HttpStatus.NOT_MODIFIED);
         } catch (Exception e) {
             errorResponse = new ErrorResponseMessage(HttpStatus.INTERNAL_SERVER_ERROR.value(), "User not created.", "Failed to create user in database.");
             LOGGER.warning("User not created. " + e);
@@ -50,15 +50,16 @@ public class AdminController {
 
     @PutMapping(path= "/update/{id}") //http://localhost:9001/admins/update/?
     public ResponseEntity<?> updateUser(@PathVariable("id") Integer id, @RequestBody AdminDTO adminDTO, HttpServletRequest request){
-        boolean validated;
+        boolean validatedAdmin, validatedId;
         AdminDTO adminUpdated;
 
         String token = request.getHeader("Authorization");
 
         try{
-            validated = adminServices.validateAdminAccess(id, token, request);
+            validatedAdmin = adminServices.validateAdminAccess(id, token, request);
+            validatedId = adminServices.validationTokenId(id, request);
 
-            if(validated){
+            if(validatedAdmin && validatedId){
                 if(adminRepository.existsByName(adminDTO.getName())){
                     errorResponse = new ErrorResponseMessage(HttpStatus.NOT_MODIFIED.value(), "User not created.", "User with this name already exists.");
                     LOGGER.warning("User not created. User with name " + adminDTO.getName() + " already exists.");
