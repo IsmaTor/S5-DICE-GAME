@@ -180,7 +180,7 @@ public class UserServicesImp implements IUserServicesDAO {
         }
 
         idUser = TokenUtils.getUserIdFromToken(token);
-        rolUser = TokenUtils.getAccessFromTokenRol(token);
+        rolUser = TokenUtils.getAccessFromTokenRole(token);
         userEntity = userRepository.findById(id).orElse(null);
 
         //if it doesn't find the user or it doesn't match it returns false.

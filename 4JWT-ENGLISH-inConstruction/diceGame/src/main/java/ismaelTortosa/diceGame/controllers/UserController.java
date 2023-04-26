@@ -75,7 +75,7 @@ public class UserController {
                     return new ResponseEntity<>(userUpdated, HttpStatus.OK);
                 }
             } else {
-                errorResponse = new ErrorResponseMessage(HttpStatus.NOT_FOUND.value(), "ERROR ID.", "ERROR: The ID is not found or TOKEN incorrect.");
+                errorResponse = new ErrorResponseMessage(HttpStatus.NOT_FOUND.value(), "IDENTIFICATION ERROR.", "ERROR: The ID is not found, TOKEN incorrect or wrong ROLE.");
                 return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
             }
         }catch (DuplicateNameException e) {

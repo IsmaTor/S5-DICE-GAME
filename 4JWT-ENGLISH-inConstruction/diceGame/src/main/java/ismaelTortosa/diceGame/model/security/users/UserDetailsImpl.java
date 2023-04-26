@@ -31,8 +31,8 @@ public class UserDetailsImpl implements UserDetails {
         return userEntity.getId_user();
     }
 
-    public String getRolUser(){
-        return userEntity.getRolUser();
+    public String getRoleUser(){
+        return userEntity.getRoleUser();
     }
 
     @Override

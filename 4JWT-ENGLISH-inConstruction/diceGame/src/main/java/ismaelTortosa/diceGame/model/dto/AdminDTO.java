@@ -16,6 +16,6 @@ public class AdminDTO implements Serializable {
     private int id_admin;
     private String name;
     private String password;
-    private String rol;
+    private final String roleAdmin = "admin";
 
 }

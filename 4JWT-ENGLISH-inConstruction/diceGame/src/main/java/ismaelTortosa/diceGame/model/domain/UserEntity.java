@@ -29,6 +29,6 @@ public class UserEntity implements Serializable {
     private LocalDate registerUpdate;
     private String password;
     private double winner;
-    private final String rolUser = "user";
+    private final String roleUser = "user";
 
 }

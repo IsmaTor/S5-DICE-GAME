@@ -23,7 +23,7 @@ public class AdminEntity implements Serializable {
     private String name;
     @Column(name = "password")
     private String password;
-    @Column(name = "rol")
-    private final String rolAdmin = "admin";
+    @Column(name = "role")
+    private final String roleAdmin = "admin";
 
 }

@@ -19,6 +19,7 @@ public class UserDTO implements Serializable {
     private double winner;
     private String password;
     private static int counter = 1;
+    private final String roleUser = "user";
 
     //Constructor to create anonymous names
     public UserDTO(){

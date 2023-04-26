@@ -32,8 +32,8 @@ public class AdminDetailsImpl implements UserDetails {
         return adminEntity.getId_admin();
     }
 
-    public String getRolAdmin(){
-        return adminEntity.getRolAdmin();
+    public String getRoleAdmin(){
+        return adminEntity.getRoleAdmin();
     }
 
     @Override

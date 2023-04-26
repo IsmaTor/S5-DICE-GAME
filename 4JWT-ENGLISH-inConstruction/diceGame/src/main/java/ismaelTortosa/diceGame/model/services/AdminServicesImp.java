@@ -90,7 +90,7 @@ public class AdminServicesImp implements IAdminServicesDAO{
     @Override
     public boolean validateAdminAccess(int id, String token, HttpServletRequest request){
         AdminEntity adminEntity;
-        String rolAdmin;
+        String roleAdmin;
         int idAdmin;
 
         token = ManagementDetailServiceImpl.getTokenAdmin(request);
@@ -99,14 +99,14 @@ public class AdminServicesImp implements IAdminServicesDAO{
             return false;
         }
 
-        rolAdmin = TokenUtils.getAccessFromTokenRol(token);
+        roleAdmin = TokenUtils.getAccessFromTokenRole(token);
         idAdmin = TokenUtils.getUserIdFromToken(token);
 
         adminEntity = adminRepository.findById(id).orElse(null);
 
         //if it doesn't find the user or it doesn't match it returns false.
-        if (!rolAdmin.equals("admin")) {
-            LOGGER.info("ERROR: The validation is incorrect, the admin does not match his ROLE = " + rolAdmin);
+        if (!roleAdmin.equals("admin")) {
+            LOGGER.info("ERROR: The validation is incorrect, the admin does not match his ROLE = " + roleAdmin);
             return false;
         } else if (idAdmin != id) {
             LOGGER.info("ERROR: The validation is incorrect, the admin does not match his ID = " + idAdmin);
@@ -115,7 +115,7 @@ public class AdminServicesImp implements IAdminServicesDAO{
             LOGGER.info("ERROR: The validation is incorrect, the admin not found = " + adminEntity);
             return false;
         }
-        LOGGER.info("Validation admin is ok: " + idAdmin + " , " + rolAdmin);
+        LOGGER.info("Validation admin is ok: " + idAdmin + " , " + roleAdmin);
         return true;
     }
 

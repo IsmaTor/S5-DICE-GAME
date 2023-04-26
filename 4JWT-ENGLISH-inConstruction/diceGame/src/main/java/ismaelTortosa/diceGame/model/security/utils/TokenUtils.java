@@ -20,11 +20,11 @@ public class TokenUtils {
     private static final JwtBuilder BUILDER = Jwts.builder().setSubject("").setExpiration(EXPIRATION_DATE).signWith(Keys.hmacShaKeyFor(SIGNING_KEY));
 
     //Token creation.
-    public static String createTokenUser(int id, String name, String password, String rolUser){
+    public static String createTokenUser(int id, String name, String password, String roleUser){
         Map<String, Object> extra = new HashMap<>();
         extra.put("name", name);
         extra.put("id", id);
-        extra.put("rolUser", rolUser);
+        extra.put("roleUser", roleUser);
 
         return BUILDER.setSubject(name)
                 .addClaims(extra)
@@ -32,10 +32,10 @@ public class TokenUtils {
     }
 
     //Token admin creation
-    public static String createTokenAdmin(int id, String name, String password, String rolAdmin) {
+    public static String createTokenAdmin(int id, String name, String password, String roleAdmin) {
         Map<String, Object> extra = new HashMap<>();
         extra.put("name", name);
-        extra.put("rolAdmin", rolAdmin);
+        extra.put("roleAdmin", roleAdmin);
         extra.put("id", id);
 
         return BUILDER.setSubject(name)
@@ -74,16 +74,16 @@ public class TokenUtils {
     }
 
     //The token rol is used.
-    public static String getAccessFromTokenRol(String token){
+    public static String getAccessFromTokenRole(String token){
         Claims claims = PARSER
                 .parseClaimsJws(token)
                 .getBody();
 
         String adminAccess = null;
-        if (claims.containsKey("rolAdmin")) {
-            adminAccess = (String) claims.get("rolAdmin");
-        } else if (claims.containsKey("rolUser")) {
-            adminAccess = (String) claims.get("rolUser");
+        if (claims.containsKey("roleAdmin")) {
+            adminAccess = (String) claims.get("roleAdmin");
+        } else if (claims.containsKey("roleUser")) {
+            adminAccess = (String) claims.get("roleUser");
         } else {
             throw new IllegalArgumentException("No role found.");
         }
