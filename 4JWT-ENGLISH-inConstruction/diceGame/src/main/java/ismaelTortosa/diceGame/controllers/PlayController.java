@@ -22,7 +22,7 @@ public class PlayController {
     private ErrorResponseMessage errorResponse;
 
     //variables
-    boolean validated, validatedRolUser;
+    private boolean validatedUser;
 
     @Autowired
     private IPlayServicesDAO playServices;
@@ -36,10 +36,9 @@ public class PlayController {
         String token = request.getHeader("Authorization");
 
         try{
-            validated = userServices.validationToken(id, request); //If there is an error in the validation method it will jump 500 (INTERNAL SERVER ERROR).
-            validatedRolUser = userServices.validateRolUserAccess(id, token, request);
+            validatedUser = userServices.validateUserAccess(id, token, request); //If there is an error in the validation method it will jump 500 (INTERNAL SERVER ERROR).
 
-            if(validated && validatedRolUser){
+            if(validatedUser){
                 throwDice = playServices.getPlay(id);
                 LOGGER.info("Dice 1: " + throwDice.getDice1() + "+ Dice 2: " + throwDice.getDice2()
                         + " = " + throwDice.playResult());
@@ -60,10 +59,12 @@ public class PlayController {
         StringBuilder sb = new StringBuilder();
         String deletedPlayIdsString;
 
-        try {
-            validated = userServices.validationToken(id, request);
+        String token = request.getHeader("Authorization");
 
-            if (validated) {
+        try {
+            validatedUser = userServices.validateUserAccess(id, token, request);
+
+            if (validatedUser) {
                 List<Integer> deletedPlayIds = playServices.deletePlay(id);
                 LOGGER.info("Plays removed: " + deletedPlayIds);
                 for (Integer playId : deletedPlayIds){

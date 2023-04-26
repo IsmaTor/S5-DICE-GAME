@@ -122,10 +122,10 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 
         if (authResult.getPrincipal() instanceof AdminDetailsImpl) { //Token for administrator.
             AdminDetailsImpl adminDetails = (AdminDetailsImpl) authResult.getPrincipal();
-            token = TokenUtils.createTokenAdmin(adminDetails.getIdAdmin(), adminDetails.getUsername(), adminDetails.getPassword(), adminDetails.getRol());
+            token = TokenUtils.createTokenAdmin(adminDetails.getIdAdmin(), adminDetails.getUsername(), adminDetails.getPassword(), adminDetails.getRolAdmin());
         } else if (authResult.getPrincipal() instanceof UserDetailsImpl) { //Token for user.
             UserDetailsImpl userDetails = (UserDetailsImpl) authResult.getPrincipal();
-            token = TokenUtils.createToken(userDetails.getIdUser(), userDetails.getUsername(), userDetails.getPassword(), userDetails.getRolUser());
+            token = TokenUtils.createTokenUser(userDetails.getIdUser(), userDetails.getUsername(), userDetails.getPassword(), userDetails.getRolUser());
         }
 
         response.addHeader("Authorization", "Bearer " + token);

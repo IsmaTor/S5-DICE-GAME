@@ -166,49 +166,34 @@ public class UserServicesImp implements IUserServicesDAO {
         return average;
     }
 
-    //Validate the token by comparing the token id with the user id.
+    //Validate the token by comparing the token rol & id with the user rol & id.
     @Override
-    public boolean validationToken(int id, HttpServletRequest request) {
+    public boolean validateUserAccess(int id, String token, HttpServletRequest request){
         UserEntity userEntity;
-        String token;
+        String rolUser;
         int idUser;
 
         token = UserDetailServiceImpl.getToken(request);
+
         if (token == null) {
             return false;
         }
 
         idUser = TokenUtils.getUserIdFromToken(token);
+        rolUser = TokenUtils.getAccessFromTokenRol(token);
         userEntity = userRepository.findById(id).orElse(null);
 
         //if it doesn't find the user or it doesn't match it returns false.
-        if (userEntity == null || idUser != id) {
-            LOGGER.info("ERROR: The validation is incorrect, the user does not match his ID!");
+        if (!rolUser.equals("user")) {
+            LOGGER.info("ERROR: The validation is incorrect, the user does not match his ROLE = " + rolUser);
             return false;
-        }
-        return true;
-    }
-
-    //nuevo
-    @Override
-    public boolean validateRolUserAccess(int id, String token, HttpServletRequest request){
-        UserEntity userEntity;
-        String rolUser;
-
-        token = UserDetailServiceImpl.getToken(request);
-
-        if (token == null) {
+        } else if (idUser != id) {
+            LOGGER.info("ERROR: The validation is incorrect, the user does not match his ID = " + idUser);
             return false;
+        } else if (userEntity == null) {
+            LOGGER.info("ERROR: The validation is incorrect, the user not found = " + userEntity);
         }
-
-        rolUser = TokenUtils.getAccessFromTokenRolUser(token);
-        userEntity = userRepository.findById(id).orElse(null);
-
-        //if it doesn't find the user or it doesn't match it returns false.
-        if (userEntity == null || !rolUser.equals("user")) {
-            LOGGER.info("ERROR: The validation is incorrect, the user does not match his ID!");
-            return false;
-        }
+        LOGGER.info("Validation user is ok: " + idUser + " , " + rolUser);
         return true;
     }
 

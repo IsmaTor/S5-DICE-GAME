@@ -30,8 +30,6 @@ public class UserController {
     private UserRepository userRepository;
     @Autowired
     private IUserServicesDAO userServices;
-    @Autowired
-    private IAdminServicesDAO adminServices;
 
     @PostMapping(path= "/add") //http://localhost:9001/players/add
     public ResponseEntity<?> addUser(@RequestBody UserDTO userDTO){
@@ -58,16 +56,15 @@ public class UserController {
 
     @PutMapping(path= "/update/{id}") //http://localhost:9001/players/update/?
     public ResponseEntity<?> updateUser(@PathVariable("id") Integer id, @RequestBody UserDTO userDTO, HttpServletRequest request){
-        boolean validated, validatedRolUser;
+        boolean validatedUser;
         UserDTO userUpdated;
 
         String token = request.getHeader("Authorization");
 
         try{
-            validated = userServices.validationToken(id, request);
-            validatedRolUser = userServices.validateRolUserAccess(id, token, request);
+            validatedUser = userServices.validateUserAccess(id, token, request);
 
-            if(validated && validatedRolUser){
+            if(validatedUser){
                 if(userRepository.existsByName(userDTO.getName())){
                     errorResponse = new ErrorResponseMessage(HttpStatus.NOT_MODIFIED.value(), "User not created.", "User with this name already exists.");
                     LOGGER.warning("User not created. User with name " + userDTO.getName() + " already exists.");

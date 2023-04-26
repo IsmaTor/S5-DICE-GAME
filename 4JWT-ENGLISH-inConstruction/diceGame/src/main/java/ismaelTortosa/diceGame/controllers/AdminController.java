@@ -50,16 +50,15 @@ public class AdminController {
 
     @PutMapping(path= "/update/{id}") //http://localhost:9001/admins/update/?
     public ResponseEntity<?> updateAdmin(@PathVariable("id") Integer id, @RequestBody AdminDTO adminDTO, HttpServletRequest request){
-        boolean validatedAdmin, validatedId;
+        boolean validatedAdmin;
         AdminDTO adminUpdated;
 
         String token = request.getHeader("Authorization");
 
         try{
             validatedAdmin = adminServices.validateAdminAccess(id, token, request);
-            validatedId = adminServices.validationTokenId(id, request);
 
-            if(validatedAdmin && validatedId){
+            if(validatedAdmin){
                 if(adminRepository.existsByName(adminDTO.getName())){
                     errorResponse = new ErrorResponseMessage(HttpStatus.NOT_MODIFIED.value(), "Admin not created.", "Admin with this name already exists.");
                     LOGGER.warning("Admin not created. Admin with name " + adminDTO.getName() + " already exists.");
@@ -70,7 +69,7 @@ public class AdminController {
                     return new ResponseEntity<>(adminUpdated, HttpStatus.OK);
                 }
             } else {
-                errorResponse = new ErrorResponseMessage(HttpStatus.NOT_FOUND.value(), "ERROR ID.", "ERROR: The ID is not found or TOKEN incorrect.");
+                errorResponse = new ErrorResponseMessage(HttpStatus.NOT_FOUND.value(), "IDENTIFICATION ERROR.", "ERROR: The ID is not found, TOKEN incorrect or wrong ROLE.");
                 return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
             }
         }catch (DuplicateNameException e) {

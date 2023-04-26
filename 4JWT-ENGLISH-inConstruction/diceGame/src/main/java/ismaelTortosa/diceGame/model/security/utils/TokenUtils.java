@@ -3,8 +3,6 @@ package ismaelTortosa.diceGame.model.security.utils;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 import java.util.*;
 
@@ -22,7 +20,7 @@ public class TokenUtils {
     private static final JwtBuilder BUILDER = Jwts.builder().setSubject("").setExpiration(EXPIRATION_DATE).signWith(Keys.hmacShaKeyFor(SIGNING_KEY));
 
     //Token creation.
-    public static String createToken(int id, String name, String password, String rolUser){
+    public static String createTokenUser(int id, String name, String password, String rolUser){
         Map<String, Object> extra = new HashMap<>();
         extra.put("name", name);
         extra.put("id", id);
@@ -34,31 +32,15 @@ public class TokenUtils {
     }
 
     //Token admin creation
-    public static String createTokenAdmin(int id, String name, String password, String rol) {
+    public static String createTokenAdmin(int id, String name, String password, String rolAdmin) {
         Map<String, Object> extra = new HashMap<>();
         extra.put("name", name);
-        extra.put("rol", rol);
+        extra.put("rolAdmin", rolAdmin);
         extra.put("id", id);
 
         return BUILDER.setSubject(name)
                 .addClaims(extra)
                 .compact();
-    }
-
-    public static UsernamePasswordAuthenticationToken getAuthenticationAdmin(String token) {
-        try {
-            Claims claims = PARSER.parseClaimsJws(token).getBody();
-
-            String name = claims.getSubject();
-            String role = (String) claims.get("rol");
-
-            List<GrantedAuthority> authorities = new ArrayList<>();
-            authorities.add(new SimpleGrantedAuthority(role));
-
-            return new UsernamePasswordAuthenticationToken(name, null, authorities);
-        } catch (JwtException e) {
-            return null;
-        }
     }
 
     //Token authentication.
@@ -92,32 +74,21 @@ public class TokenUtils {
     }
 
     //The token rol is used.
-    public static String getAccessFromToken(String token){
+    public static String getAccessFromTokenRol(String token){
         Claims claims = PARSER
                 .parseClaimsJws(token)
                 .getBody();
 
-        Object adminAccessObject = claims.get("rol");
-        if(adminAccessObject == null){
-            throw  new IllegalArgumentException("No role admin.");
+        String adminAccess = null;
+        if (claims.containsKey("rolAdmin")) {
+            adminAccess = (String) claims.get("rolAdmin");
+        } else if (claims.containsKey("rolUser")) {
+            adminAccess = (String) claims.get("rolUser");
+        } else {
+            throw new IllegalArgumentException("No role found.");
         }
 
-        String adminAccess = (String) adminAccessObject;
         return adminAccess;
-    }
-
-    public static String getAccessFromTokenRolUser(String token){
-        Claims claims = PARSER
-                .parseClaimsJws(token)
-                .getBody();
-
-        Object userAccessObject = claims.get("rolUser");
-        if(userAccessObject == null){
-            throw  new IllegalArgumentException("No role user.");
-        }
-
-        String userAccess = (String) userAccessObject;
-        return userAccess;
     }
 
     //Get token. Method not used.

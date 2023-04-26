@@ -39,42 +39,42 @@ public class AdminServicesImp implements IAdminServicesDAO{
                 adminEntity.setPassword(passwordCodified);
 
                 adminRepository.save(adminEntity);
-                LOGGER.info("User " + adminDto.getName() + " added successfully");
+                LOGGER.info("Admin " + adminDto.getName() + " added successfully");
             } else {
-                LOGGER.warning("User " + adminDto.getName() + " already exists in the game database");
-                throw new DuplicateNameException("User with name " + adminDto.getName() + " already exists in the game database");
+                LOGGER.warning("Admin " + adminDto.getName() + " already exists in the game database");
+                throw new DuplicateNameException("Admin with name " + adminDto.getName() + " already exists in the game database");
             }
         } catch (Exception e){
-            LOGGER.warning("Error adding user: " + e.getMessage());
+            LOGGER.warning("Error adding admin: " + e.getMessage());
         }
     }
 
     @Override
     public AdminDTO update(int id, AdminDTO adminDTO) {
-        AdminEntity userUpdate = null;
-        AdminEntity userEntity;
+        AdminEntity adminUpdate = null;
+        AdminEntity adminEntity;
 
         String password;
         String passwordCodified;
 
         try{
             if (!adminRepository.existsByName(adminDTO.getName())) {
-                userEntity = adminRepository.findById(id).orElseThrow();
-                userEntity.setName(adminDTO.getName());
+                adminEntity = adminRepository.findById(id).orElseThrow();
+                adminEntity.setName(adminDTO.getName());
 
                 password = adminDTO.getPassword();
                 passwordCodified = webSecurityConfig.passwordEncoder().encode(password);
-                userEntity.setPassword(passwordCodified);
+                adminEntity.setPassword(passwordCodified);
 
-                userUpdate = adminRepository.save(userEntity);
-                LOGGER.info("User " + adminDTO.getName() + " updated successfully");
+                adminUpdate = adminRepository.save(adminEntity);
+                LOGGER.info("Admin " + adminDTO.getName() + " updated successfully");
             } else {
-                LOGGER.warning("User " + adminDTO.getName() + " already exists in the game database");
+                LOGGER.warning("Admin " + adminDTO.getName() + " already exists in the game database");
             }
         } catch (Exception e){
-            LOGGER.warning("Error updating user: " + e.getMessage());
+            LOGGER.warning("Error updating admin: " + e.getMessage());
         }
-        return convertEntityToDTO(userUpdate);
+        return convertEntityToDTO(adminUpdate);
     }
 
     //Entity to DTO
@@ -90,44 +90,32 @@ public class AdminServicesImp implements IAdminServicesDAO{
     @Override
     public boolean validateAdminAccess(int id, String token, HttpServletRequest request){
         AdminEntity adminEntity;
-        String rolUser;
-
-        token = ManagementDetailServiceImpl.getTokenAdmin(request);
-
-        if (token == null) {
-            return false;
-        }
-
-        rolUser = TokenUtils.getAccessFromToken(token);
-        adminEntity = adminRepository.findById(id).orElse(null);
-
-        //if it doesn't find the user or it doesn't match it returns false.
-        if (adminEntity == null || !rolUser.equals("admin")) {
-            LOGGER.info("ERROR: The validation is incorrect, the user does not match his ID!");
-            return false;
-        }
-        return true;
-    }
-
-    @Override
-    public boolean validationTokenId(int id, HttpServletRequest request) {
-        AdminEntity adminEntity;
-        String token;
+        String rolAdmin;
         int idAdmin;
 
         token = ManagementDetailServiceImpl.getTokenAdmin(request);
+
         if (token == null) {
             return false;
         }
 
+        rolAdmin = TokenUtils.getAccessFromTokenRol(token);
         idAdmin = TokenUtils.getUserIdFromToken(token);
+
         adminEntity = adminRepository.findById(id).orElse(null);
 
         //if it doesn't find the user or it doesn't match it returns false.
-        if (adminEntity == null || idAdmin != id) {
-            LOGGER.info("ERROR: The validation is incorrect, the user does not match his ID!");
+        if (!rolAdmin.equals("admin")) {
+            LOGGER.info("ERROR: The validation is incorrect, the admin does not match his ROLE = " + rolAdmin);
+            return false;
+        } else if (idAdmin != id) {
+            LOGGER.info("ERROR: The validation is incorrect, the admin does not match his ID = " + idAdmin);
+            return false;
+        } else if (adminEntity == null) {
+            LOGGER.info("ERROR: The validation is incorrect, the admin not found = " + adminEntity);
             return false;
         }
+        LOGGER.info("Validation admin is ok: " + idAdmin + " , " + rolAdmin);
         return true;
     }
 
