@@ -11,4 +11,9 @@ public interface IAdminServicesDAO {
 
     public boolean validateAdminAccess(int id, String token, HttpServletRequest request); //Validate admin's by comparing the token role & id with admin role & id.
 
+    public void deletePlayers(int id); //DEL /admins: remove players in the game.
+
+    public boolean playerExists(Integer id); //Check if the player exists in the game.
+
+    public boolean validateAdminAccessMaster(int id, String token, HttpServletRequest request); //Validate admin's by comparing the token role with admin role.
 }
