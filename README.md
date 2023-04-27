@@ -8,6 +8,7 @@ CASTELLANO
 	- Ahora solo permite 5 intentos para hacer el login, si no la cuenta se bloquea por un tiempo determinado.
 	- Posibilidad de logearse a nivel de administrador y realizar acciones de administrador.
 	- Un administrador no puede jugar ni modificar jugadores y un usuario no puede hacer de administrador.
+	- Un administrador puede eliminar jugadores y así mismo.
 *************************************************************************************************************************************
 CATALÀ
 - Joc de daus amb persistencia a MySql i MongoDB.
@@ -16,6 +17,7 @@ CATALÀ
 	- Ara només permet 5 intents d'inici de sessió, sinó es fa de manera correcta el compte es bloqueja per un temps determinat. 
 	- Possibilitat de logejar-se a nivell d'administrador i fer accions d'administrador.
 	- Un administrador no pot jugar ni modificar jugadors i un usuari no pot fer d'administrador.
+	- Un administrador pot eliminar jugadors i així mateix.
 *************************************************************************************************************************************
 ENGLISH
 - Dice game with persistence in MySql and MongoDB.
@@ -24,3 +26,4 @@ ENGLISH
 	- Now it only allows 5 attempts to login, otherwise the account is blocked for a certain time.
 	- Possibility of logging in at the administrator level and performing administrator actions.
 	- An administrator cannot play or modify players and a user cannot act as an administrator.
+	- An administrator can remove players and himself.
