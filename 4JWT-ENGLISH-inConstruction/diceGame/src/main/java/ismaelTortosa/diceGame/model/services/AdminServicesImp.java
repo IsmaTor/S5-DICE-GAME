@@ -14,12 +14,14 @@ import org.hibernate.query.IllegalNamedQueryOptionsException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
 import java.util.logging.Logger;
 
 @Service
 public class AdminServicesImp implements IAdminServicesDAO{
 
     private static final Logger LOGGER = Logger.getLogger(AdminServicesImp.class.getName());
+    private AdminEntity adminEntity;
 
     @Autowired
     private AdminRepository adminRepository;
@@ -30,7 +32,7 @@ public class AdminServicesImp implements IAdminServicesDAO{
 
     @Override
     public void add(AdminDTO adminDto) {
-        AdminEntity adminEntity = new AdminEntity();
+        adminEntity = new AdminEntity();
 
         String password;
         String passwordCodified;
@@ -57,7 +59,6 @@ public class AdminServicesImp implements IAdminServicesDAO{
     @Override
     public AdminDTO update(int id, AdminDTO adminDTO) {
         AdminEntity adminUpdate = null;
-        AdminEntity adminEntity;
 
         String password;
         String passwordCodified;
@@ -94,7 +95,6 @@ public class AdminServicesImp implements IAdminServicesDAO{
 
     @Override
     public boolean validateAdminAccess(int id, String token, HttpServletRequest request){
-        AdminEntity adminEntity;
         String roleAdmin;
         int idAdmin;
 
@@ -153,13 +153,29 @@ public class AdminServicesImp implements IAdminServicesDAO{
             userRepository.delete(userEntity);
             LOGGER.info("Player with ID: " + id + " eliminated.");
         } catch (Exception e){
-            LOGGER.warning("Player with ID: " + id + " could not delete");
+            LOGGER.warning("Player with ID: " + id + " could not delete" + e.getMessage());
+        }
+    }
+
+    @Override
+    public void deleteAdmins(int id) {
+        try {
+            adminEntity = adminRepository.findById(id).orElseThrow();
+            adminRepository.delete(adminEntity);
+            LOGGER.info("Admin with ID: " + id + " eliminated.");
+        } catch (Exception e){
+            LOGGER.warning("Admin with ID: " + id + " could not delete." + e.getMessage());
         }
     }
 
     @Override
     public boolean playerExists(Integer id){
         return userRepository.findById(id).isPresent();
+    }
+
+    @Override
+    public boolean adminExists(Integer id) {
+        return adminRepository.findById(id).isPresent();
     }
 
 }

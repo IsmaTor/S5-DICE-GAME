@@ -42,11 +42,11 @@ public class AdminController {
             }
         } catch (DuplicateNameException e) {
             errorResponse = new ErrorResponseMessage(HttpStatus.NOT_MODIFIED.value(), "Admin not created.", "Admin with this name already exists.");
-            LOGGER.warning("Admin not created. " + e);
+            LOGGER.warning("Admin not created. " + e.getMessage());
             return new ResponseEntity<>(errorResponse, HttpStatus.NOT_MODIFIED);
         } catch (Exception e) {
             errorResponse = new ErrorResponseMessage(HttpStatus.INTERNAL_SERVER_ERROR.value(), "Admin not created.", "Failed to create admin in database.");
-            LOGGER.warning("Admin not created. " + e);
+            LOGGER.warning("Admin not created. " + e.getMessage());
             return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
@@ -76,41 +76,71 @@ public class AdminController {
             }
         }catch (DuplicateNameException e) {
             errorResponse = new ErrorResponseMessage(HttpStatus.BAD_REQUEST.value(), "Admin not modified.", "Admin with this name already exists.");
-            LOGGER.warning("Admin not modified. " + e);
+            LOGGER.warning("Admin not modified. " + e.getMessage());
             return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
         } catch (Exception e){
-            LOGGER.warning("ERROR: Admin update not possible. " + e);
+            LOGGER.warning("ERROR: Admin update not possible. " + e.getMessage());
             errorResponse = new ErrorResponseMessage(HttpStatus.INTERNAL_SERVER_ERROR.value(), "ERROR: Admin update not possible.", "Fail of the game or data base system.");
             return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
-    @DeleteMapping(path = "/delete/{id}")
+    @DeleteMapping(path = "/deleteUsers/{id}")
     public ResponseEntity<?> RemovesPlayers(@PathVariable("id") Integer id, @RequestBody Confirmation confirmation, HttpServletRequest request) {
         String token = request.getHeader("Authorization");
 
         try {
+            if (adminServices.playerExists(id)) {
             validatedAdmin = adminServices.validateAdminAccessMaster(id, token, request);
 
             if(validatedAdmin) {
-                if (adminServices.playerExists(id)) {
-                    if (confirmation.isConfirmed()) {
-                        adminServices.deletePlayers(id);
-                        return new ResponseEntity<>("Player removed successfully.", HttpStatus.OK);
-                    } else {
-                        errorResponse = new ErrorResponseMessage(HttpStatus.OK.value(), "The player has not been removed.", "Be sure to include the 'Yes' parameter in the removal request.");
-                        return new ResponseEntity<>(errorResponse, HttpStatus.OK);
-                    }
+                if (confirmation.isConfirmed()) {
+                    adminServices.deletePlayers(id);
+                    return new ResponseEntity<>("Player removed successfully.", HttpStatus.OK);
                 } else {
-                    errorResponse = new ErrorResponseMessage(HttpStatus.OK.value(), "The player has not been removed.", "The player does not exist or has already been removed.");
+                    errorResponse = new ErrorResponseMessage(HttpStatus.OK.value(), "The player has not been removed.", "Be sure to include the 'Yes' parameter in the removal request.");
                     return new ResponseEntity<>(errorResponse, HttpStatus.OK);
                 }
             } else {
-                errorResponse = new ErrorResponseMessage(HttpStatus.NOT_FOUND.value(), "ERROR ID.", "ID FAILED.");
+                errorResponse = new ErrorResponseMessage(HttpStatus.OK.value(), "ERROR ID.", "ID FAILED.");
+                return new ResponseEntity<>(errorResponse, HttpStatus.OK);
+            }
+            } else {
+                errorResponse = new ErrorResponseMessage(HttpStatus.NOT_FOUND.value(), "The player has not been removed.", "The player does not exist or has already been removed.");
                 return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
             }
         } catch (Exception e) {
-            errorResponse = new ErrorResponseMessage(HttpStatus.OK.value(), "ERROR: The player has not been removed.", "The player has not been removed due to some problem in the game database.");
+            errorResponse = new ErrorResponseMessage(HttpStatus.INTERNAL_SERVER_ERROR.value(), "ERROR: The player has not been removed.", "The player has not been removed due to some problem in the game database." + e.getMessage());
+            return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @DeleteMapping(path = "/deleteAdmins/{id}")
+    public ResponseEntity<?> RemovesAdmins(@PathVariable("id") Integer id, @RequestBody Confirmation confirmation, HttpServletRequest request) {
+        String token = request.getHeader("Authorization");
+
+        try{
+            if (adminServices.adminExists(id)) {
+                validatedAdmin = adminServices.validateAdminAccess(id, token, request);
+
+                if(validatedAdmin) {
+                    if(confirmation.isConfirmed()) {
+                        adminServices.deleteAdmins(id);
+                        return new ResponseEntity<>("Admin removed successfully", HttpStatus.OK);
+                    } else {
+                        errorResponse = new ErrorResponseMessage(HttpStatus.OK.value(), "The admin has not been removed.", "Be sure to include the 'Yes' parameter in the removal request.");
+                        return new ResponseEntity<>(errorResponse, HttpStatus.OK);
+                    }
+                } else {
+                    errorResponse = new ErrorResponseMessage(HttpStatus.NOT_FOUND.value(), "ERROR ID.", "ID FAILED.");
+                    return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
+                }
+            } else {
+                errorResponse = new ErrorResponseMessage(HttpStatus.OK.value(), "The admin has not been removed.", "The admin does not exist or has already been removed.");
+                return new ResponseEntity<>(errorResponse, HttpStatus.OK);
+            }
+        } catch (Exception e) {
+            errorResponse = new ErrorResponseMessage(HttpStatus.INTERNAL_SERVER_ERROR.value(), "ERROR: The admin has not been removed.", "The admin has not been removed due to some problem in the game database." + e.getMessage());
             return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }

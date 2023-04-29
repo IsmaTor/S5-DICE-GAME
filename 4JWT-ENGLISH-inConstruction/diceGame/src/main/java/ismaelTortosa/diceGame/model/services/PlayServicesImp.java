@@ -37,7 +37,7 @@ public class PlayServicesImp implements IPlayServicesDAO{
             playCreated = playRepository.save(playEntity);
             calculatedAverage(userEntity);
         } catch (Exception e){
-            LOGGER.warning("The game was not possible. " + e);
+            LOGGER.warning("The game was not possible. " + e.getMessage());
         }
         return playCreated;
     }
@@ -56,7 +56,7 @@ public class PlayServicesImp implements IPlayServicesDAO{
 
             LOGGER.info("User " + userEntity.getName() + " plays have been removed.");
         } catch (Exception e) {
-            LOGGER.warning("Could not delete plays." + e);
+            LOGGER.warning("Could not delete plays." + e.getMessage());
         }
         return deletedPlayIds;
     }
