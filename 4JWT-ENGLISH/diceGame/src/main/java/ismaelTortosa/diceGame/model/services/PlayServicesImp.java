@@ -14,7 +14,7 @@ import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 @Service
-public class PlayServicesImp implements IPlayServicesDAO{
+public class PlayServicesImp implements IPlayServices {
 
     private static final Logger LOGGER = Logger.getLogger(PlayServicesImp.class.getName());
 

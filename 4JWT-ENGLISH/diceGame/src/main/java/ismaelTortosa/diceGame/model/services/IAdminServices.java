@@ -3,7 +3,7 @@ package ismaelTortosa.diceGame.model.services;
 import ismaelTortosa.diceGame.model.dto.AdminDTO;
 import jakarta.servlet.http.HttpServletRequest;
 
-public interface IAdminServicesDAO {
+public interface IAdminServices {
 
     public void add(AdminDTO adminDTO); //POST /admins: create a admin.
 

@@ -10,15 +10,13 @@ import ismaelTortosa.diceGame.model.security.configuration.WebSecurityConfig;
 import ismaelTortosa.diceGame.model.security.users.ManagementDetailServiceImpl;
 import ismaelTortosa.diceGame.model.security.utils.TokenUtils;
 import jakarta.servlet.http.HttpServletRequest;
-import org.hibernate.query.IllegalNamedQueryOptionsException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
 import java.util.logging.Logger;
 
 @Service
-public class AdminServicesImp implements IAdminServicesDAO{
+public class AdminServicesImp implements IAdminServices {
 
     private static final Logger LOGGER = Logger.getLogger(AdminServicesImp.class.getName());
     private AdminEntity adminEntity;

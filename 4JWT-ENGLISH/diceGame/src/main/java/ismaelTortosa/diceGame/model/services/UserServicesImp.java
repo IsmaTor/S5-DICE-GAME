@@ -20,7 +20,7 @@ import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 @Service
-public class UserServicesImp implements IUserServicesDAO {
+public class UserServicesImp implements IUserServices {
     private static final Logger LOGGER = Logger.getLogger(UserServicesImp.class.getName());
 
     @Autowired

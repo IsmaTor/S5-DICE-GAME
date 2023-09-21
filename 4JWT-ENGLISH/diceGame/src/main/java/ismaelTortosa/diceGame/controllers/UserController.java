@@ -4,8 +4,7 @@ import ismaelTortosa.diceGame.model.dto.UserDTO;
 import ismaelTortosa.diceGame.model.exceptions.DuplicateNameException;
 import ismaelTortosa.diceGame.model.exceptions.ErrorResponseMessage;
 import ismaelTortosa.diceGame.model.repository.UserRepository;
-import ismaelTortosa.diceGame.model.services.IAdminServicesDAO;
-import ismaelTortosa.diceGame.model.services.IUserServicesDAO;
+import ismaelTortosa.diceGame.model.services.IUserServices;
 
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,7 +28,7 @@ public class UserController {
     @Autowired
     private UserRepository userRepository;
     @Autowired
-    private IUserServicesDAO userServices;
+    private IUserServices userServices;
 
     @PostMapping(path= "/add") //http://localhost:9001/players/add
     public ResponseEntity<?> addUser(@RequestBody UserDTO userDTO){

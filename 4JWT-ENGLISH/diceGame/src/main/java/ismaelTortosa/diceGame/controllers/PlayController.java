@@ -2,8 +2,8 @@ package ismaelTortosa.diceGame.controllers;
 
 import ismaelTortosa.diceGame.model.domain.PlayEntity;
 import ismaelTortosa.diceGame.model.exceptions.ErrorResponseMessage;
-import ismaelTortosa.diceGame.model.services.IPlayServicesDAO;
-import ismaelTortosa.diceGame.model.services.IUserServicesDAO;
+import ismaelTortosa.diceGame.model.services.IPlayServices;
+import ismaelTortosa.diceGame.model.services.IUserServices;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -25,9 +25,9 @@ public class PlayController {
     private boolean validatedUser;
 
     @Autowired
-    private IPlayServicesDAO playServices;
+    private IPlayServices playServices;
     @Autowired
-    private IUserServicesDAO userServices;
+    private IUserServices userServices;
 
     @PostMapping(path= "/game/{id}") //http://localhost:9001/players/game/?
     public ResponseEntity<?> diceGame(@PathVariable("id") int id, HttpServletRequest request){

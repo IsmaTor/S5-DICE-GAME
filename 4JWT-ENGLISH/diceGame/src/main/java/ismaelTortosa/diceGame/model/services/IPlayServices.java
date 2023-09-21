@@ -4,7 +4,7 @@ import ismaelTortosa.diceGame.model.domain.PlayEntity;
 
 import java.util.List;
 
-public interface IPlayServicesDAO {
+public interface IPlayServices {
 
     public List<Integer> deletePlay(int id); //DELETE /players/{id}/games: removes a player's plays.
 

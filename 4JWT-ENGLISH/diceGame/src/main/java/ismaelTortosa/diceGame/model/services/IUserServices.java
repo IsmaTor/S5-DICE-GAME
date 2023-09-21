@@ -5,7 +5,7 @@ import jakarta.servlet.http.HttpServletRequest;
 
 import java.util.List;
 
-public interface IUserServicesDAO {
+public interface IUserServices {
 
     public void add(UserDTO userDto); //POST /players: create a user.
 

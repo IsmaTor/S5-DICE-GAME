@@ -5,7 +5,7 @@ import ismaelTortosa.diceGame.model.dto.AdminDTO;
 import ismaelTortosa.diceGame.model.exceptions.DuplicateNameException;
 import ismaelTortosa.diceGame.model.exceptions.ErrorResponseMessage;
 import ismaelTortosa.diceGame.model.repository.AdminRepository;
-import ismaelTortosa.diceGame.model.services.IAdminServicesDAO;
+import ismaelTortosa.diceGame.model.services.IAdminServices;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -26,7 +26,7 @@ public class AdminController {
     @Autowired
     private AdminRepository adminRepository;
     @Autowired
-    private IAdminServicesDAO adminServices;
+    private IAdminServices adminServices;
 
     @PostMapping(path= "/add") //http://localhost:9001/admins/add
     public ResponseEntity<?> addAdmin(@RequestBody AdminDTO adminDTO){
